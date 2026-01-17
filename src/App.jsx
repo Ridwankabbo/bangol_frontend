@@ -7,6 +7,7 @@ import LandingLayout from './components/LandingPageLayout'
 import LandingPage from './LandingPage'
 import Singup from './singup'
 import Singin from './singin'
+import Cart from './components/Cart'
 
 function App() {
   
@@ -17,7 +18,7 @@ function App() {
         <Routes>
           <Route path='/' element={<LandingLayout/>} >
             <Route index element={<LandingPage/>}/>
-            
+            <Route path='/cart' element={<Cart/>}/>
           </Route>
           <Route path='/singup' element={<Singup/>}/>
           <Route path='/singin' element={<Singin/>}/>
