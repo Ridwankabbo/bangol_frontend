@@ -1,31 +1,35 @@
 import React from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const Singin = ()=>{
-    const singin_url = 'http://localhost:8000/api/singup';
+const Singin = () => {
+    const singin_url = 'http://localhost:8000/user/login/api/token/';
 
     const [data, setData] = useState({});
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log(data);
-        
+
         const request = await fetch(singin_url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                "Accept": "application/json",
             },
             body: JSON.stringify(data)
         });
 
         try {
-            const result = await request.json();
-            console.log(result);
-            localStorage.settItem('accessToken', result.token?.accessToken?.plainTextToken);
-            console.log(localStorage.getItem('accessToken'));
-            
+            if (request.ok) {
+                const result = await request.json();
+                console.log(result);
+                localStorage.settItem('accessToken', result.token?.accessToken?.plainTextToken);
+                console.log(localStorage.getItem('accessToken'));
+                navigate('/dashboard');
+
+            }
+
 
         } catch (error) {
 
@@ -44,7 +48,7 @@ const Singin = ()=>{
                 <div className="text-5xl">Sing up</div>
                 <div>
                     <form className="py-5 px-5 flex flex-col gap-7" onSubmit={handleSubmit}>
-                        
+
                         <div>
                             <input type="email" placeholder="Enter email" name="email" id="email" onChange={handleChange} className="py-2 px-8 border rounded-2xl" />
                         </div>
