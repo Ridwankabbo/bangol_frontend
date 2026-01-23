@@ -45,7 +45,7 @@ const Singin = () => {
     return (
         <>
             <div className="text-center py-20" >
-                <div className="text-5xl">Sing up</div>
+                <div className="text-5xl">Sing in</div>
                 <div>
                     <form className="py-5 px-5 flex flex-col gap-7" onSubmit={handleSubmit}>
 
@@ -56,7 +56,7 @@ const Singin = () => {
                             <input type="password" placeholder="Enter password" name="password" id="email" onChange={handleChange} className="py-2 px-8 border rounded-2xl" />
                         </div>
                         <div>
-                            <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-2xl font-semibold text-xl">Sing up</button>
+                            <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-2xl font-semibold text-xl">Sing in</button>
                         </div>
                     </form>
                     <div>
