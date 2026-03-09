@@ -1,1 +1,105 @@
-@import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+@import "tailwindcss";
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f4f6f4;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #68c985;
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2d8a47;
+  }
+}
+
+/* @layer components {
+  .btn-base {
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-full transition-all duration-200 cursor-pointer;
+  }
+
+  .btn-green {
+    @apply btn-base bg-gradient-to-r from-green-700 to-green-500 text-white shadow-green hover:-translate-y-0.5 hover:shadow-lg;
+  }
+
+  .btn-yellow {
+    @apply btn-base bg-gradient-to-r from-yellow-deep to-yellow-bright text-gray-800 shadow-yellow hover:-translate-y-0.5;
+  }
+
+  .btn-red {
+    @apply btn-base bg-gradient-to-r from-red-dark to-red-bright text-white shadow-red hover:-translate-y-0.5;
+  }
+
+  .btn-outline-green {
+    @apply btn-base border-2 border-green-primary text-green-primary hover:bg-green-primary hover:text-white;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover;
+  }
+
+  .section-title {
+    @apply font-heading font-extrabold text-gray-800 text-3xl;
+  }
+
+  .section-subtitle {
+    @apply text-gray-400 text-base mt-2;
+  }
+
+  .badge {
+    @apply inline-block text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full;
+  }
+
+  .badge-new {
+    @apply badge bg-green-600 text-white;
+  }
+
+  .badge-sale {
+    @apply badge bg-red-primary text-white;
+  }
+
+  .badge-hot {
+    @apply badge bg-yellow-primary text-gray-800;
+  }
+
+  .badge-organic {
+    @apply badge bg-green-dark text-white;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-primary focus:ring-2 focus:ring-green-100 transition-all;
+  }
+} */
