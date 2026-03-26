@@ -1,10 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { FiFilter, FiGrid, FiList, FiChevronRight, FiX, FiSearch, FiCpu } from 'react-icons/fi';
 import ProductCard from '../components/ProductCard/ProductCard';
-import { categories } from '../data/categories';
-import { getProducts } from '../api/products';
+import { getProducts, getCategories, getProductsByCategory } from '../api/products';
 import toast from 'react-hot-toast';
 
 const SORT_OPTIONS = [
@@ -18,6 +16,7 @@ const SORT_OPTIONS = [
 export default function Shop() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [aiProducts, setAiProducts] = useState(null); // null means no AI recommendations active
     const [loading, setLoading] = useState(true);
     const [sort, setSort] = useState('default');
@@ -29,25 +28,38 @@ export default function Shop() {
     const searchQuery = searchParams.get('search') || '';
 
     useEffect(() => {
+        getCategories().then(setCategories);
+    }, []);
+
+    useEffect(() => {
         const fetchShopProducts = async () => {
-            if (aiProducts) return; // Don't fetch if showing AI results
+            if (aiProducts) return;
             setLoading(true);
             try {
-                const params = {
-                    category: selectedCategory !== 'all' ? selectedCategory : undefined,
-                    search: searchQuery || undefined,
-                    ordering: sort === 'price-asc' ? 'price' : sort === 'price-desc' ? '-price' : sort === 'rating' ? '-rating' : undefined
-                };
-                const data = await getProducts(params);
+                const params = {};
+                if (searchQuery) params.search = searchQuery;
+
+                if (sort === 'price-asc') params.ordering = 'price';
+                else if (sort === 'price-desc') params.ordering = '-price';
+                else if (sort === 'rating') params.ordering = '-rating';
+                else if (sort === 'new') params.ordering = '-created_at';
+
+                let data;
+                if (selectedCategory !== 'all') {
+                    data = await getProductsByCategory(selectedCategory, params);
+                } else {
+                    data = await getProducts(params);
+                }
                 setProducts(data);
             } catch (err) {
                 console.error('Failed to fetch shop products:', err);
+                toast.error('Failed to load products');
             } finally {
                 setLoading(false);
             }
         };
         fetchShopProducts();
-    }, []);
+    }, [selectedCategory, searchQuery, sort, aiProducts]);
 
     useEffect(() => {
         const handleAIProducts = (e) => {

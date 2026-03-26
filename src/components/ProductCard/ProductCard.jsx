@@ -6,7 +6,7 @@ import { formatPrice } from '../../utils/format';
 
 export default function ProductCard({ product }) {
     console.log(product);
-    
+
     const { addToCart, toggleWishlist, isInWishlist, isInCart } = useCart();
     const price = Number(product.price);
     const originalPrice = Number(product.originalPrice);
@@ -34,10 +34,13 @@ export default function ProductCard({ product }) {
         <div className="bg-white rounded-2xl overflow-hidden shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover group flex flex-col">
             {/* Image */}
             <div className="relative overflow-hidden aspect-[4/3] bg-gray-50">
-                {product.product_image && product.product_image.length > 0 && (
-                    <img src={`http://localhost:8000/${product.product_image[0].image}`} alt={product.product_image[0].alt_text}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    loading="lazy" />
+                {product.product_image_front && product.product_image_front.length > 0 && (
+                    <img
+                        src={`http://localhost:8000${product.product_image_front[0].image}`}
+                        alt={product.product_image_front[0].alt_text || product.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                    />
                 )}
                 {badge && <span className={`${badge.cls} absolute top-3 left-3 z-10`}>{badge.label}</span>}
 

@@ -6,14 +6,22 @@ import { useNavigate, useLocation } from 'react-router-dom';
 export default function ChatWidget() {
     const [isOpen, setIsOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
-    const [messages, setMessages] = useState([
-        { role: 'assistant', text: 'Hi! I am your Bangol assistant. How can I help you find fresh products today?' }
-    ]);
+    const [messages, setMessages] = useState(() => {
+        const saved = localStorage.getItem('chat_history');
+        return saved ? JSON.parse(saved) : [
+            { role: 'assistant', text: 'Hi! I am your Bangol assistant. How can I help you find fresh products today?' }
+        ];
+    });
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const scrollRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Save messages to localStorage whenever they change
+    useEffect(() => {
+        localStorage.setItem('chat_history', JSON.stringify(messages));
+    }, [messages]);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -26,34 +34,36 @@ export default function ChatWidget() {
         if (!input.trim() || loading) return;
 
         const userMsg = input.trim();
-        setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+        const newUserMessage = { role: 'user', text: userMsg };
+        setMessages(prev => [...prev, newUserMessage]);
         setInput('');
         setLoading(true);
 
         try {
+            console.log('Sending message:', userMsg);
             const response = await sendChatMessage(userMsg);
+            console.log('Chat API Raw Response:', response);
 
             const assistantMsg = {
                 role: 'assistant',
-                text: response.message,
-                products: response.products
+                text: response.message || response.text || "I found some great products for you!",
+                products: response.products || []
             };
 
+            console.log('Assistant Message Object:', assistantMsg);
             setMessages(prev => [...prev, assistantMsg]);
 
-            // If products are returned, we notify the shop page.
-            // We'll use a custom event for simplicity across routes.
             if (response.products && response.products.length > 0) {
                 window.dispatchEvent(new CustomEvent('ai_products_received', {
                     detail: response.products
                 }));
 
-                // If we are not on the shop page, navigate there
                 if (location.pathname !== '/shop') {
                     navigate('/shop');
                 }
             }
         } catch (err) {
+            console.error('Chat handleSend error:', err);
             setMessages(prev => [...prev, { role: 'assistant', text: "Sorry, I'm having trouble connecting right now. Please try again later." }]);
         } finally {
             setLoading(false);
@@ -64,7 +74,7 @@ export default function ChatWidget() {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-6 right-6 w-14 h-14 bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center text-2xl hover:scale-110 transition-all z-[100] animate-bounce-slow"
+                className="fixed bottom-6 right-6 w-14 h-14 bg-green-primary text-white rounded-full shadow-lg flex items-center justify-center text-2xl hover:scale-110 transition-all z-[100] animate-bounce-slow"
             >
                 <FiMessageSquare />
             </button>
@@ -101,8 +111,8 @@ export default function ChatWidget() {
                         {messages.map((m, i) => (
                             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 <div className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-sm ${m.role === 'user'
-                                        ? 'bg-green-primary text-white rounded-tr-none'
-                                        : 'bg-white text-gray-700 rounded-tl-none border border-gray-100'
+                                    ? 'bg-green-primary text-white rounded-tr-none'
+                                    : 'bg-white text-gray-700 rounded-tl-none border border-gray-100'
                                     }`}>
                                     {m.text}
                                     {m.products && m.products.length > 0 && (

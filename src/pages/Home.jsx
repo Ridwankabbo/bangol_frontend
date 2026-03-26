@@ -4,8 +4,9 @@ import { FiArrowRight, FiTruck, FiRefreshCw, FiShield, FiHeadphones } from 'reac
 import HeroSection from '../components/HeroSection/HeroSection';
 import CategoryCard from '../components/CategoryCard/CategoryCard';
 import ProductCard from '../components/ProductCard/ProductCard';
-import { categories } from '../data/categories';
-import { getProducts } from '../api/products';
+import { getProducts, getCategories } from '../api/products';
+import { formatPrice } from '../utils/format';
+import { BASE_URL } from '../api/axios';
 
 const features = [
     { icon: <FiTruck />, title: 'Free Delivery', desc: 'On orders over $30', color: 'text-green-primary', bg: 'bg-green-50' },
@@ -48,20 +49,25 @@ function PromoBar() {
 }
 
 function FlashDealCard({ product }) {
-    const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+    const price = Number(product.price);
+    const originalPrice = Number(product.originalPrice);
+    const discount = originalPrice && originalPrice > price
+        ? Math.round(((originalPrice - price) / originalPrice) * 100)
+        : 0;
+
     return (
         <Link to={`/product/${product.id}`}
             className="bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 flex gap-0 group no-underline">
             <div className="w-28 h-28 flex-shrink-0 overflow-hidden">
-                <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                <img src={`${BASE_URL}${product.image}`} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     onError={e => { e.target.src = `https://picsum.photos/seed/${product.id}/200/200`; }} />
             </div>
             <div className="flex flex-col justify-center p-4 flex-1">
                 <p className="text-[10px] font-bold text-red-primary uppercase tracking-widest">Flash Deal</p>
                 <p className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mt-0.5">{product.name}</p>
                 <div className="flex items-center gap-2 mt-2">
-                    <span className="text-base font-extrabold text-green-primary">${product.price.toFixed(2)}</span>
-                    <span className="text-xs line-through text-gray-400">${product.originalPrice.toFixed(2)}</span>
+                    <span className="text-base font-extrabold text-green-primary">${formatPrice(product.price)}</span>
+                    <span className="text-xs line-through text-gray-400">${formatPrice(product.originalPrice)}</span>
                     <span className="text-[10px] font-bold bg-red-primary text-white px-1.5 py-0.5 rounded-full">{discount}%</span>
                 </div>
             </div>
@@ -72,14 +78,19 @@ function FlashDealCard({ product }) {
 export default function Home() {
     const [activeTab, setActiveTab] = useState('featured');
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchHomeData = async () => {
             setLoading(true);
             try {
-                const data = await getProducts();
-                setProducts(data);
+                const [prodsData, catsData] = await Promise.all([
+                    getProducts(),
+                    getCategories()
+                ]);
+                setProducts(prodsData);
+                setCategories(catsData);
             } catch (err) {
                 console.error('Failed to fetch home products:', err);
             } finally {
@@ -95,7 +106,7 @@ export default function Home() {
         return products.filter(p => p.badge === 'featured' || !p.badge);
     };
 
-    const flashDeals = products.filter(p => p.badge === 'sale' || p.badge === 'hot').slice(0, 3);
+    const flashDeals = products.filter(p => p.badge === 'sale' || p.badge === 'hot' || Number(p.originalPrice) > Number(p.price)).slice(0, 3);
 
     return (
         <div className="min-h-screen bg-gray-50">

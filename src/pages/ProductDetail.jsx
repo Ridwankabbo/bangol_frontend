@@ -3,7 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { FiStar, FiHeart, FiShoppingCart, FiChevronRight, FiMinus, FiPlus, FiTruck, FiRefreshCw, FiShield } from 'react-icons/fi';
 import ProductCard from '../components/ProductCard/ProductCard';
 import { getProductById, getProducts } from '../api/products';
+import { formatPrice } from '../utils/format';
 import { useCart } from '../context/CartContext';
+import { BASE_URL } from '../api/axios';
 
 export default function ProductDetail() {
     const { id } = useParams();
@@ -49,8 +51,13 @@ export default function ProductDetail() {
         </div>
     );
 
-    const imgs = [product.image, ...Array(3).fill(0).map((_, i) => `https://picsum.photos/seed/${product.id + i + 10}/600/400`)].filter(Boolean);
-    const discount = product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : null;
+    const imgs = [
+        product.image ? (product.image.startsWith('http') ? product.image : `${BASE_URL}${product.image}`) : null,
+        ...Array(3).fill(0).map((_, i) => `https://picsum.photos/seed/${product.id + i + 10}/600/400`)
+    ].filter(Boolean);
+    const price = Number(product.price);
+    const originalPrice = Number(product.originalPrice);
+    const discount = originalPrice && originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : null;
     const inWishlist = isInWishlist(product.id);
 
     const renderStars = (r) => Array.from({ length: 5 }, (_, i) => (
@@ -111,9 +118,9 @@ export default function ProductDetail() {
                             <span className="text-sm text-gray-400">({product.reviews} reviews)</span>
                         </div>
                         <div className="flex items-baseline gap-3 pb-5 border-b border-gray-100">
-                            <span className="font-heading font-black text-3xl text-green-primary">${product.price.toFixed(2)}</span>
+                            <span className="font-heading font-black text-3xl text-green-primary">${formatPrice(product.price)}</span>
                             {product.originalPrice && (
-                                <span className="text-lg text-gray-400 line-through">${product.originalPrice.toFixed(2)}</span>
+                                <span className="text-lg text-gray-400 line-through">${formatPrice(product.originalPrice)}</span>
                             )}
                             {discount && <span className="badge badge-sale">{discount}% Off</span>}
                         </div>

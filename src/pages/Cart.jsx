@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { FiTrash2, FiArrowRight, FiShoppingBag, FiChevronRight } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
+import { formatPrice } from '../utils/format';
+import { BASE_URL } from '../api/axios';
 
 export default function Cart() {
     const { cartItems, cartTotal, removeFromCart, updateQuantity, clearCart } = useCart();
@@ -41,13 +43,13 @@ export default function Cart() {
                         {cartItems.map(item => (
                             <div key={item.id} className="bg-white rounded-2xl shadow-card p-5 flex gap-4 hover:border-green-200 border border-transparent transition-all">
                                 <Link to={`/product/${item.id}`} className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 no-underline">
-                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover hover:scale-110 transition-transform"
+                                    <img src={item.image ? (item.image.startsWith('http') ? item.image : `${BASE_URL}${item.image}`) : ''} alt={item.name} className="w-full h-full object-cover hover:scale-110 transition-transform"
                                         onError={e => { e.target.src = `https://picsum.photos/seed/${item.id}/200/200`; }} />
                                 </Link>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-[10px] font-bold text-green-primary uppercase tracking-widest capitalize">{item.category}</p>
                                     <Link to={`/product/${item.id}`} className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug hover:text-green-primary transition-colors no-underline">{item.name}</Link>
-                                    <p className="text-green-primary font-extrabold text-base mt-1">${item.price.toFixed(2)}</p>
+                                    <p className="text-green-primary font-extrabold text-base mt-1">${formatPrice(item.price)}</p>
                                 </div>
                                 <div className="flex flex-col items-end justify-between gap-3">
                                     <button onClick={() => removeFromCart(item.id)} className="p-1.5 text-gray-400 hover:text-red-primary hover:bg-red-pale rounded-lg transition-all">
@@ -60,7 +62,7 @@ export default function Cart() {
                                         <button onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                             className="w-8 h-8 bg-gray-50 hover:bg-green-50 hover:text-green-primary text-gray-600 font-bold flex items-center justify-center text-lg transition-all">+</button>
                                     </div>
-                                    <p className="font-extrabold text-gray-800 text-sm">${(item.price * item.quantity).toFixed(2)}</p>
+                                    <p className="font-extrabold text-gray-800 text-sm">${formatPrice(Number(item.price) * item.quantity)}</p>
                                 </div>
                             </div>
                         ))}
@@ -82,9 +84,9 @@ export default function Cart() {
                             <h3 className="font-heading font-bold text-gray-800 mb-5">Order Summary</h3>
                             <div className="flex flex-col gap-3">
                                 {[
-                                    { label: 'Subtotal', val: `$${cartTotal.toFixed(2)}` },
-                                    { label: 'Delivery', val: delivery === 0 ? 'FREE 🎉' : `$${delivery.toFixed(2)}`, special: delivery === 0 },
-                                    { label: 'Tax (8%)', val: `$${tax.toFixed(2)}` },
+                                    { label: 'Subtotal', val: `$${formatPrice(cartTotal)}` },
+                                    { label: 'Delivery', val: delivery === 0 ? 'FREE 🎉' : `$${formatPrice(delivery)}`, special: delivery === 0 },
+                                    { label: 'Tax (8%)', val: `$${formatPrice(tax)}` },
                                 ].map(r => (
                                     <div key={r.label} className="flex justify-between text-sm text-gray-600">
                                         <span>{r.label}</span>
@@ -93,12 +95,12 @@ export default function Cart() {
                                 ))}
                                 {delivery > 0 && (
                                     <p className="text-[11px] text-yellow-deep bg-yellow-pale border border-dashed border-yellow-primary rounded-lg py-2 px-3 font-semibold text-center">
-                                        Add ${(30 - cartTotal).toFixed(2)} more for free shipping!
+                                        Add ${formatPrice(30 - cartTotal)} more for free shipping!
                                     </p>
                                 )}
                                 <div className="border-t-2 border-dashed border-gray-200 pt-3 flex justify-between font-extrabold text-base text-gray-800">
                                     <span>Total</span>
-                                    <span className="text-green-primary">${total.toFixed(2)}</span>
+                                    <span className="text-green-primary">${formatPrice(total)}</span>
                                 </div>
                             </div>
                             <Link to="/checkout"

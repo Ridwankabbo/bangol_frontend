@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
+import { formatPrice } from '../utils/format';
 
 const STEPS = ['Cart', 'Shipping', 'Payment', 'Confirm'];
 
@@ -76,7 +77,7 @@ export default function Checkout() {
             <div className="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center text-green-primary text-5xl shadow-green">✅</div>
             <h2 className="font-heading font-black text-3xl text-gray-800">Order Placed!</h2>
             <p className="text-gray-500 max-w-md">Thank you for your order! You'll receive a confirmation email at <strong>{form.email}</strong>. Estimated delivery: <strong>2 hours</strong>.</p>
-            <p className="text-2xl font-black text-green-primary">Total: ${total.toFixed(2)}</p>
+            <p className="text-2xl font-black text-green-primary">Total: ${formatPrice(total)}</p>
             <div className="flex gap-4 flex-wrap justify-center">
                 <Link to="/shop" className="btn-green px-8 py-3.5 rounded-full no-underline">Continue Shopping</Link>
                 <Link to="/" className="btn-outline-green px-8 py-3.5 rounded-full no-underline">Go Home</Link>
@@ -217,16 +218,16 @@ export default function Checkout() {
                                     <p className="text-xs font-semibold text-gray-700 line-clamp-1">{item.name}</p>
                                     <p className="text-xs text-gray-400">x{item.quantity}</p>
                                 </div>
-                                <p className="text-sm font-bold text-green-primary flex-shrink-0">${(item.price * item.quantity).toFixed(2)}</p>
+                                <p className="text-sm font-bold text-green-primary flex-shrink-0">${formatPrice(Number(item.price) * item.quantity)}</p>
                             </div>
                         ))}
                     </div>
                     <div className="border-t border-dashed border-gray-200 pt-4 flex flex-col gap-2.5">
-                        <div className="flex justify-between text-sm text-gray-600"><span>Subtotal</span><span className="font-semibold">${cartTotal.toFixed(2)}</span></div>
-                        <div className="flex justify-between text-sm text-gray-600"><span>Delivery</span><span className={`font-semibold ${delivery === 0 ? 'text-green-primary' : ''}`}>{delivery === 0 ? 'FREE' : `$${delivery.toFixed(2)}`}</span></div>
-                        <div className="flex justify-between text-sm text-gray-600"><span>Tax (8%)</span><span className="font-semibold">${tax.toFixed(2)}</span></div>
+                        <div className="flex justify-between text-sm text-gray-600"><span>Subtotal</span><span className="font-semibold">${formatPrice(cartTotal)}</span></div>
+                        <div className="flex justify-between text-sm text-gray-600"><span>Delivery</span><span className={`font-semibold ${delivery === 0 ? 'text-green-primary' : ''}`}>{delivery === 0 ? 'FREE' : `$${formatPrice(delivery)}`}</span></div>
+                        <div className="flex justify-between text-sm text-gray-600"><span>Tax (8%)</span><span className="font-semibold">${formatPrice(tax)}</span></div>
                         <div className="flex justify-between font-extrabold text-base text-gray-800 pt-2 border-t border-gray-200 mt-1">
-                            <span>Total</span><span className="text-green-primary">${total.toFixed(2)}</span>
+                            <span>Total</span><span className="text-green-primary">${formatPrice(total)}</span>
                         </div>
                     </div>
                 </div>
